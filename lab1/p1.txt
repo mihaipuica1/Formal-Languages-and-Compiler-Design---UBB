@@ -1,0 +1,24 @@
+let x $ number;
+let y $ number;
+let z $ number;
+let max $ number;
+
+x <- 4;
+y <- 5;
+z <- 1;
+max <- 0;
+
+if (max smaller_than x)
+{
+    max <- x;
+}
+if (max smaller_than y)
+{
+    max <- y;
+}
+if (max smaller_than z)
+{
+    max <- z;
+}
+
+print max;

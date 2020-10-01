@@ -1,0 +1,10 @@
+let a $ numbr;
+let b $ number;
+
+
+a <- 0;
+b <- 0b;
+
+let c $ number;
+
+c <- a plus b;
