@@ -1,9 +1,9 @@
-let a $ numbr;
+let a $ number;
 let b $ number;
 
 
 a <- 0;
-b <- 0b;
+b < 0b;
 
 let c $ number;
 
