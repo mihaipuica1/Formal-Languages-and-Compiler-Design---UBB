@@ -1,3 +1,4 @@
+&START&
 let x $ number;
 let y $ number;
 let aux $ number;
@@ -13,3 +14,4 @@ while (y not_equals 0)
 }
 
 print x;
+&END&

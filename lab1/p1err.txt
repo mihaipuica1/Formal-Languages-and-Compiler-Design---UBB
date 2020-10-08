@@ -1,3 +1,4 @@
+&START&
 let a $ number;
 let b $ number;
 
@@ -8,3 +9,4 @@ b < 2;
 let c $ number;
 
 c <- a plus b;
+&END&
