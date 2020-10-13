@@ -32,3 +32,4 @@ Lexic:
         operatori separatori keywords
         cod identifiers
         cod constants
+        
