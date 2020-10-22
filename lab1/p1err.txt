@@ -1,0 +1,12 @@
+&START&
+let a $ number;
+let b $ number;
+
+
+a <- 0;;
+b < 2;
+
+let c $ number;
+
+c <- a plus b;
+&END&
