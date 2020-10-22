@@ -25,4 +25,3 @@ class SymbolTable:
         self.__list.append(newPair)
         return self.__position - 1
 
-
