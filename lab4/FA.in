@@ -1,0 +1,8 @@
+Q=p,q
+E=0,1
+F=q
+qo=p
+D=
+(p,a)=p
+(p,b)=q
+(q,b)=q

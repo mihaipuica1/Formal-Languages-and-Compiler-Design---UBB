@@ -27,7 +27,7 @@ Lexic:
             char = 'letter' | 'digit'
         -string:
             char = letter | digit
-            string = char {string}
+            string = "char {string}"
 
         operatori separatori keywords
         cod identifiers
