@@ -1,8 +1,9 @@
-Q=p,q
-E=0,1
-F=q
-qo=p
+PPQPQ
+Q=P,Q
+E=a,b
+F=Q
+qo=P
 D=
-(p,a)=p
-(p,b)=q
-(q,b)=q
+(P,a)=P
+(P,b)=Q
+(Q,b)=Q
