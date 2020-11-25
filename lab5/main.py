@@ -1,6 +1,12 @@
+from Parser import Parser
+
 from Grammar import *
 
-Grammar = Grammar("grammar.in")
-Grammar.getGrammarFromFile()
-Grammar.menu()
+grammar = Grammar("grammar.in")
+grammar.getGrammarFromFile()
+grammar.menu()
 
+parser = Parser(grammar)
+print("Canonical collection: ")
+for state in parser.computeCanonicalCollection():
+    print(state)

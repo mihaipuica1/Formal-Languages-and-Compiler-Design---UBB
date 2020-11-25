@@ -13,12 +13,12 @@ class Grammar:
     def getGrammarFromFile(self):
         with open(self.__fileName) as file:
             # the first strip() gets rid of the newline at the end of the line
-            self.__nonTerminals = file.readline().strip()
-            self.__terminals = file.readline().strip()
+            self.__nonTerminals = file.readline().strip().split(' ')
+            self.__terminals = file.readline().strip().split(' ')
             self.__startSymbol = file.readline().strip()
 
             for line in file:
-                production = line.strip().replace(' ', '').split("->")
+                production = line.strip().replace(' ', '')
                 self.__productions.append(production)
 
     def menu(self):
@@ -27,6 +27,7 @@ class Grammar:
         print("3. Print the starting symbol")
         print("4. Print the productions")
         print("5. Print the productions for a given non-terminal")
+        print("6. Exit")
         while True:
             menuCommand = input()
             if menuCommand == "1":
@@ -38,16 +39,16 @@ class Grammar:
             elif menuCommand == "4":
                 print("The productions are:")
                 for production in self.__productions:
-                    printedProduction = production[0] + " -> " + production[1]
-                    print(printedProduction)
+                    print(production)
             elif menuCommand == "5":
                 givenNonTerminal = input("Input the non-terminal: ")
                 print(givenNonTerminal)
                 productionsToPrint = self.getProductionsForNonTerminal(givenNonTerminal)
                 print("The productions for the " + givenNonTerminal + " non-terminal are:")
                 for production in productionsToPrint:
-                    printedProduction = production[0] + " -> " + production[1]
-                    print(printedProduction)
+                    print(production)
+            elif menuCommand == "6":
+                return
 
     def getNonTerminals(self):
         return self.__nonTerminals
