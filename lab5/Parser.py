@@ -42,6 +42,7 @@ class Parser:
         while True:
             initialC = list(canonicalCollection)
             for state in canonicalCollection:
+                print(state)
                 for X in NUE:
                     gotoResult = self.goto(state, X, self.__grammar.getProductions())
                     if gotoResult != [] and gotoResult not in canonicalCollection:
