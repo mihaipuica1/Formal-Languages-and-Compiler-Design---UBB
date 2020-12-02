@@ -6,6 +6,7 @@ class Parser:
     def __init__(self, grammar):
         self.__grammar = grammar
         self.__gotoList = []
+        self.__table = self.generateTable()
 
     def closure(self, itemSet, productions):
         closureResult = list(itemSet)
@@ -108,6 +109,10 @@ class Parser:
                     table['action'][state[0]] = "reduce " + str(self.getReduce(item))
                 elif '.' in item and item[-1] != '.':
                     table['action'][state[0]] = "shift"
+                else:
+                    table['action'][state[0]] = "error"
+
+        self.__table = table
 
         tableHeaders = [" "]
         tableContent = []
@@ -121,3 +126,50 @@ class Parser:
                 tableContent[state[0]].append(str(table[row][state[0]]))
 
         print(tabulate(tableContent, headers=tableHeaders))
+
+    def parse(self):
+        self.generateTable()
+        sequence = str(input("Enter sequence: "))
+        stateIndex = 0
+        alpha = ["0"]
+        beta = list(sequence)
+        phi = []
+        for character in beta:
+            if character not in self.__grammar.getTerminals():
+                print("error")
+                return
+        while True:
+            if self.__table["action"][stateIndex] == "shift":
+                if len(beta) == 0:
+                    print("error")
+                    return
+                a = beta[0]
+                beta = beta[1:]
+                stateIndex = self.__table[a][stateIndex]
+                if stateIndex != "-":
+                    alpha.append(a)
+                    alpha.append(str(stateIndex))
+                else:
+                    print("error")
+                    return
+            else:
+                if "reduce" in self.__table["action"][stateIndex]:
+                    reduceIndex = int(self.__table["action"][stateIndex].split(" ")[1])
+                    production = self.__grammar.getProductions()[reduceIndex - 1]
+                    lhp = production[0]
+                    rhp = production[3:]
+                    for i in range(0, 2 * len(rhp)):
+                        alpha.pop()
+                    stateIndex = self.__table[lhp][int(alpha[-1])]
+                    alpha.append(lhp)
+                    alpha.append(stateIndex)
+                    phi.append(reduceIndex)
+                else:
+                    if self.__table["action"][stateIndex] == "accept":
+                        print("success")
+                        phi.reverse()
+                        print(phi)
+                        return
+                    else:
+                        print("error")
+                        return
