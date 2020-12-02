@@ -1,7 +1,11 @@
+from tabulate import tabulate
+
+
 class Parser:
 
     def __init__(self, grammar):
         self.__grammar = grammar
+        self.__gotoList = []
 
     def closure(self, itemSet, productions):
         closureResult = list(itemSet)
@@ -30,6 +34,8 @@ class Parser:
                 if symbolAfterDot == X:
                     newItem = self.swap(item, item.index(".") + 1, item.index("."))
                     itemsWithX.append(newItem)
+        self.__gotoList.append([itemSet, X, self.closure(itemsWithX, productions)])
+
         return self.closure(itemsWithX, productions)
 
     def computeCanonicalCollection(self):
@@ -42,12 +48,76 @@ class Parser:
         while True:
             initialC = list(canonicalCollection)
             for state in canonicalCollection:
-                print(state)
                 for X in NUE:
                     gotoResult = self.goto(state, X, self.__grammar.getProductions())
                     if gotoResult != [] and gotoResult not in canonicalCollection:
                         canonicalCollection.append(gotoResult)
             if canonicalCollection == initialC:
                 break
-
         return canonicalCollection
+
+    def getReduce(self, item):
+        productionIndex = 1
+        for production in self.__grammar.getProductions():
+            if production == item[:-1]:
+                return productionIndex
+            else:
+                productionIndex += 1
+
+    def generateTable(self):
+        canonicalCollection = self.computeCanonicalCollection()
+        for i in range(0, len(canonicalCollection)):
+            canonicalCollection[i] = [i, canonicalCollection[i]]
+
+        for state in canonicalCollection:
+            print(state)
+
+        noDuplicatesGotoList = []
+
+        for goto in self.__gotoList:
+            if goto not in noDuplicatesGotoList:
+                noDuplicatesGotoList.append(goto)
+
+        for goto in noDuplicatesGotoList:
+            for state in canonicalCollection:
+                if goto[0] == state[1]:
+                    goto[0] = state[0]
+                if goto[2] == state[1]:
+                    goto[2] = state[0]
+                if not goto[2]:
+                    goto[2] = 'O'
+
+        maxLength = len(canonicalCollection)
+        table = {}
+        table['action'] = ['-'] * maxLength
+        for terminal in self.__grammar.getTerminals():
+            table[terminal] = ['-'] * maxLength
+        for nonTerminal in self.__grammar.getNonTerminals():
+            table[nonTerminal] = ['-'] * maxLength
+
+        for state in canonicalCollection:
+            for goto in noDuplicatesGotoList:
+                if goto[0] == state[0] and goto[2] != 'O':
+                    table[goto[1]][state[0]] = goto[2]
+
+        for state in canonicalCollection:
+            for item in state[1]:
+                if item == "X->S.":
+                    table['action'][state[0]] = "accept"
+                elif item[-1] == '.' and item[0] != 'X':
+                    table['action'][state[0]] = "reduce " + str(self.getReduce(item))
+                elif '.' in item and item[-1] != '.':
+                    table['action'][state[0]] = "shift"
+
+        tableHeaders = [" "]
+        tableContent = []
+        for row in table:
+            tableHeaders.append(row)
+        for i in range(len(canonicalCollection)):
+            tableContent.append([str(i)])
+
+        for state in canonicalCollection:
+            for row in table:
+                tableContent[state[0]].append(str(table[row][state[0]]))
+
+        print(tabulate(tableContent, headers=tableHeaders))
