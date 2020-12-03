@@ -3,10 +3,11 @@ from tabulate import tabulate
 
 class Parser:
 
-    def __init__(self, grammar):
+    def __init__(self, grammar, outFilename, sequenceFilename):
         self.__grammar = grammar
         self.__gotoList = []
-        self.__table = self.generateTable()
+        self.__outFilename = outFilename
+        self.__sequenceFilename = sequenceFilename
 
     def closure(self, itemSet, productions):
         closureResult = list(itemSet)
@@ -129,19 +130,22 @@ class Parser:
 
     def parse(self):
         self.generateTable()
-        sequence = str(input("Enter sequence: "))
+        sequence = self.readSequenceFromFile()
+        result = ""
         stateIndex = 0
         alpha = ["0"]
         beta = list(sequence)
         phi = []
         for character in beta:
             if character not in self.__grammar.getTerminals():
-                print("error")
+                result = "error: " + character + " is not a terminal"
+                self.writeResultToFile(result)
                 return
         while True:
             if self.__table["action"][stateIndex] == "shift":
                 if len(beta) == 0:
-                    print("error")
+                    result = "error"
+                    self.writeResultToFile(result)
                     return
                 a = beta[0]
                 beta = beta[1:]
@@ -150,7 +154,8 @@ class Parser:
                     alpha.append(a)
                     alpha.append(str(stateIndex))
                 else:
-                    print("error")
+                    result = "error"
+                    self.writeResultToFile(result)
                     return
             else:
                 if "reduce" in self.__table["action"][stateIndex]:
@@ -166,10 +171,22 @@ class Parser:
                     phi.append(reduceIndex)
                 else:
                     if self.__table["action"][stateIndex] == "accept":
-                        print("success")
+                        result += "success\n"
                         phi.reverse()
-                        print(phi)
+                        result += str(phi) + "\n"
+                        for productionIndex in phi:
+                            result += self.__grammar.getProductions()[productionIndex - 1] + "\n"
+                        self.writeResultToFile(result)
                         return
                     else:
-                        print("error")
+                        result = "error"
+                        self.writeResultToFile(result)
                         return
+
+    def readSequenceFromFile(self):
+        with open(self.__sequenceFilename) as file:
+            return file.readline().strip()
+
+    def writeResultToFile(self, result):
+        with open(self.__outFilename, "w") as file:
+            file.write(result)
