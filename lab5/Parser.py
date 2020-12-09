@@ -103,6 +103,7 @@ class Parser:
                     table[goto[1]][state[0]] = goto[2]
 
         for state in canonicalCollection:
+            stateAction = ""
             for item in state[1]:
                 if item == "X->S.":
                     table['action'][state[0]] = "accept"
@@ -112,6 +113,13 @@ class Parser:
                     table['action'][state[0]] = "shift"
                 else:
                     table['action'][state[0]] = "error"
+                if stateAction == "":
+                    stateAction = table['action'][state[0]]
+                else:
+                    if stateAction != table['action'][state[0]]:
+                        result = "error: there is a " + stateAction + "-" + table['action'][state[0]] + " conflict"
+                        self.writeResultToFile(result)
+                        return
 
         self.__table = table
 

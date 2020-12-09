@@ -1,8 +1,5 @@
 success
-[1, 2, 2, 2, 2, 3]
-S->aA
-A->bA
-A->bA
-A->bA
-A->bA
-A->c
+[2, 2, 3]
+S->aSb
+S->aSb
+S->c
