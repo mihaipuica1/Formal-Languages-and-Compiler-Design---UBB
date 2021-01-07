@@ -1,0 +1,67 @@
+
+LETTER           [A-Za-z]
+UNDERLINE        [_]
+DIGIT            [0-9]
+IDENTIFIER       {LETTER}({LETTER} | {DIGIT})*
+INTEGER          {DIGIT}({DIGIT})*
+CHAR             '{LETTER}'|'{DIGIT}'
+STRING           "{CHAR}({STRING})*"
+SEPARATORS       ["("")""[""]""{""}";: ]
+OPERATORS        [+-*/"<-""++""and""or""smaller_than""bigger_than""equals""not_equals"]
+
+%%
+
+"&START&"        {printf("Reserved word:/s", yytext);}
+"&END&"          {printf("Reserved word:/s", yytext);}
+"let"            {printf("Reserved word:/s", yytext);}
+"&"              {printf("Reserved word:/s", yytext);}
+"number"         {printf("Reserved word:/s", yytext);}
+"string"         {printf("Reserved word:/s", yytext);}
+"array_numbers"  {printf("Reserved word:/s", yytext);}
+"if"             {printf("Reserved word:/s", yytext);}
+"while"          {printf("Reserved word:/s", yytext);}
+"for"            {printf("Reserved word:/s", yytext);}
+"read"           {printf("Reserved word:/s", yytext);}
+"print"          {printf("Reserved word:/s", yytext);}
+
+
+"("              {printf("Separator:/c", yytext);}
+")"              {printf("Separator:/c", yytext);}
+"["              {printf("Separator:/c", yytext);}
+"]"              {printf("Separator:/c", yytext);}
+"{"              {printf("Separator:/c", yytext);}
+"}"              {printf("Separator:/c", yytext);}
+";"              {printf("Separator:/c", yytext);} 
+":"              {printf("Separator:/c", yytext);}
+" "              {printf("Separator:/c", yytext);}
+
+"+"              {printf("Operator:/c", yytext);}
+"-"              {printf("Operator:/c", yytext);}
+"*"              {printf("Operator:/c", yytext);}
+"/"              {printf("Operator:/c", yytext);}
+"<-"             {printf("Operator:/s", yytext);}
+"++"             {printf("Operator:/s", yytext);}
+"and"            {printf("Operator:/s", yytext);}
+"or"             {printf("Operator:/s", yytext);}
+"smaller_than"   {printf("Operator:/s", yytext);}
+"bigger_than"    {printf("Operator:/s", yytext);}
+"equals"         {printf("Operator:/s", yytext);}
+"not_equals"     {printf("Operator:/s", yytext);}
+
+%%
+
+main( argc, argv )
+int argc;
+char **argv;
+    {
+        ++argv, --argc;	/* skip over program name */
+        if ( argc > 0 )
+            yyin = fopen( argv[0], "r" );
+        else
+            yyin = stdin;
+    yylex();
+    }
+
+#ifndef yywrap
+   yywrap() { return 1; }
+#endif
