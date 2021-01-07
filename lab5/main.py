@@ -1,12 +1,11 @@
 from Parser import Parser
 
 from Grammar import *
-
-grammar = Grammar("grammar.in")
+#TODO: tratat conflicte si code review pentru rares si pugna echipa 3 git pugna
+grammar = Grammar("g2-conflict.txt")
 grammar.getGrammarFromFile()
 grammar.menu()
 
-parser = Parser(grammar)
-print("Canonical collection: ")
-for state in parser.computeCanonicalCollection():
-    print(state)
+parser = Parser(grammar, "out1.txt", "seq.txt")
+parser.parse()
+

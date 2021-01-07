@@ -3,9 +3,11 @@ from tabulate import tabulate
 
 class Parser:
 
-    def __init__(self, grammar):
+    def __init__(self, grammar, outFilename, sequenceFilename):
         self.__grammar = grammar
         self.__gotoList = []
+        self.__outFilename = outFilename
+        self.__sequenceFilename = sequenceFilename
 
     def closure(self, itemSet, productions):
         closureResult = list(itemSet)
@@ -101,6 +103,7 @@ class Parser:
                     table[goto[1]][state[0]] = goto[2]
 
         for state in canonicalCollection:
+            stateAction = ""
             for item in state[1]:
                 if item == "X->S.":
                     table['action'][state[0]] = "accept"
@@ -108,6 +111,17 @@ class Parser:
                     table['action'][state[0]] = "reduce " + str(self.getReduce(item))
                 elif '.' in item and item[-1] != '.':
                     table['action'][state[0]] = "shift"
+                else:
+                    table['action'][state[0]] = "error"
+                if stateAction == "":
+                    stateAction = table['action'][state[0]]
+                else:
+                    if stateAction != table['action'][state[0]]:
+                        result = "error: there is a " + stateAction + "-" + table['action'][state[0]] + " conflict"
+                        self.writeResultToFile(result)
+                        return
+
+        self.__table = table
 
         tableHeaders = [" "]
         tableContent = []
@@ -121,3 +135,66 @@ class Parser:
                 tableContent[state[0]].append(str(table[row][state[0]]))
 
         print(tabulate(tableContent, headers=tableHeaders))
+
+    def parse(self):
+        self.generateTable()
+        sequence = self.readSequenceFromFile()
+        result = ""
+        stateIndex = 0
+        alpha = ["0"]
+        beta = list(sequence)
+        phi = []
+        for character in beta:
+            if character not in self.__grammar.getTerminals():
+                result = "error: " + character + " is not a terminal"
+                self.writeResultToFile(result)
+                return
+        while True:
+            if self.__table["action"][stateIndex] == "shift":
+                if len(beta) == 0:
+                    result = "error"
+                    self.writeResultToFile(result)
+                    return
+                a = beta[0]
+                beta = beta[1:]
+                stateIndex = self.__table[a][stateIndex]
+                if stateIndex != "-":
+                    alpha.append(a)
+                    alpha.append(str(stateIndex))
+                else:
+                    result = "error"
+                    self.writeResultToFile(result)
+                    return
+            else:
+                if "reduce" in self.__table["action"][stateIndex]:
+                    reduceIndex = int(self.__table["action"][stateIndex].split(" ")[1])
+                    production = self.__grammar.getProductions()[reduceIndex - 1]
+                    lhp = production[0]
+                    rhp = production[3:]
+                    for i in range(0, 2 * len(rhp)):
+                        alpha.pop()
+                    stateIndex = self.__table[lhp][int(alpha[-1])]
+                    alpha.append(lhp)
+                    alpha.append(stateIndex)
+                    phi.append(reduceIndex)
+                else:
+                    if self.__table["action"][stateIndex] == "accept":
+                        result += "success\n"
+                        phi.reverse()
+                        result += str(phi) + "\n"
+                        for productionIndex in phi:
+                            result += self.__grammar.getProductions()[productionIndex - 1] + "\n"
+                        self.writeResultToFile(result)
+                        return
+                    else:
+                        result = "error"
+                        self.writeResultToFile(result)
+                        return
+
+    def readSequenceFromFile(self):
+        with open(self.__sequenceFilename) as file:
+            return file.readline().strip()
+
+    def writeResultToFile(self, result):
+        with open(self.__outFilename, "w") as file:
+            file.write(result)
